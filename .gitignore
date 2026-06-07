@@ -1,0 +1,12 @@
+node_modules/
+
+*.pptx
+
+debug-*.js
+debug-*.json
+debug_*.js
+debug_*.json
+
+*.log
+.DS_Store
+Thumbs.db

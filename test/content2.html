@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 1280px; height: 720px; font-family: "Microsoft YaHei", Arial; }
+  .slide {
+    width: 1280px;
+    height: 720px;
+    position: relative;
+    background-color: #FFFFFF;
+  }
+  .header-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1280px;
+    height: 60px;
+    background-color: #1A3A5C;
+  }
+  .header-title {
+    position: absolute;
+    top: 12px;
+    left: 40px;
+    font-size: 28px;
+    color: #FFFFFF;
+    font-weight: bold;
+  }
+  .table-area {
+    position: absolute;
+    top: 100px;
+    left: 60px;
+    width: 1160px;
+  }
+  .section-title {
+    font-size: 32px;
+    color: #1A3A5C;
+    font-weight: bold;
+    margin-bottom: 30px;
+  }
+  table {
+    width: 1160px;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  th {
+    background-color: #1A3A5C;
+    color: #FFFFFF;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    padding: 12px 20px;
+  }
+  td {
+    font-size: 16px;
+    color: #333333;
+    text-align: center;
+    padding: 10px 20px;
+    background-color: #FFFFFF;
+  }
+  tr:nth-child(even) td {
+    background-color: #F5F8FC;
+  }
+  .list-area {
+    position: absolute;
+    top: 440px;
+    left: 60px;
+    width: 540px;
+  }
+  .list-title {
+    font-size: 24px;
+    color: #1A3A5C;
+    font-weight: bold;
+    margin-bottom: 15px;
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+  ul li {
+    font-size: 18px;
+    color: #444444;
+    margin-bottom: 10px;
+    padding-left: 20px;
+  }
+  .highlight-area {
+    position: absolute;
+    top: 440px;
+    left: 660px;
+    width: 540px;
+    height: 200px;
+    background-color: #FFF3E0;
+    border-radius: 8px;
+  }
+  .highlight-title {
+    position: absolute;
+    top: 460px;
+    left: 690px;
+    font-size: 24px;
+    color: #CC6600;
+    font-weight: bold;
+  }
+  .highlight-text {
+    position: absolute;
+    top: 500px;
+    left: 690px;
+    width: 480px;
+    font-size: 18px;
+    color: #555555;
+  }
+  .page-number {
+    position: absolute;
+    bottom: 20px;
+    right: 40px;
+    font-size: 14px;
+    color: #999999;
+  }
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="header-bar"></div>
+  <div class="header-title">数据总览</div>
+  <div class="table-area">
+    <div class="section-title">季度关键指标</div>
+    <table>
+      <tr>
+        <th>指标</th>
+        <th>Q1 实际</th>
+        <th>Q2 目标</th>
+        <th>Q2 实际</th>
+        <th>环比增长</th>
+      </tr>
+      <tr>
+        <td>月活用户数</td>
+        <td>12,000</td>
+        <td>15,000</td>
+        <td>16,200</td>
+        <td>+35%</td>
+      </tr>
+      <tr>
+        <td>日活用户数</td>
+        <td>3,500</td>
+        <td>4,500</td>
+        <td>4,800</td>
+        <td>+37%</td>
+      </tr>
+      <tr>
+        <td>付费转化率</td>
+        <td>4.2%</td>
+        <td>5.0%</td>
+        <td>5.3%</td>
+        <td>+26%</td>
+      </tr>
+      <tr>
+        <td>用户满意度</td>
+        <td>85分</td>
+        <td>88分</td>
+        <td>91分</td>
+        <td>+7%</td>
+      </tr>
+    </table>
+  </div>
+  <div class="list-area">
+    <div class="list-title">下季度重点</div>
+    <ul>
+      <li>启动 V3.0 版本需求评审</li>
+      <li>完成国际化多语言支持</li>
+      <li>优化移动端用户体验</li>
+      <li>建立用户反馈闭环机制</li>
+    </ul>
+  </div>
+  <div class="highlight-area"></div>
+  <div class="highlight-title">亮点</div>
+  <div class="highlight-text">付费转化率首次突破 5%，用户满意度创历史新高，核心指标全面超额完成。</div>
+  <div class="page-number">3 / 3</div>
+</div>
+</body>
+</html>

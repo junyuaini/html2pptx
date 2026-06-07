@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>核心功能特性</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  width: 1280px;
+  height: 720px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #2d333b 0%, #161b22 40%, #0d1117 70%, #000000 100%);
+  font-family: "Microsoft YaHei", Arial, sans-serif;
+}
+.slide {
+  width: 1280px;
+  height: 720px;
+  position: relative;
+  padding: 0;
+}
+
+/* 顶部装饰条 */
+.top-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: #238636;
+}
+
+/* 标题区 */
+.header {
+  position: absolute;
+  top: 40px;
+  left: 60px;
+  right: 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.title-group h1 {
+  font-size: 42px;
+  color: #f0f6fc;
+  font-weight: bold;
+  letter-spacing: 3px;
+  margin-bottom: 8px;
+}
+.title-group p {
+  font-size: 16px;
+  color: #8b949e;
+  letter-spacing: 1px;
+}
+.title-line {
+  width: 50px;
+  height: 3px;
+  background-color: #238636;
+  margin-top: 12px;
+}
+.header-badge {
+  background-color: rgba(35,134,54,0.15);
+  border: 1px solid rgba(35,134,54,0.3);
+  color: #3fb950;
+  font-size: 13px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  letter-spacing: 1px;
+  margin-top: 8px;
+}
+
+/* 左侧功能卡片区 */
+.cards-section {
+  position: absolute;
+  left: 60px;
+  top: 160px;
+  width: 560px;
+}
+.card-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.func-card {
+  background-color: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 10px;
+  padding: 16px 18px;
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  overflow: hidden;
+}
+.func-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #238636;
+}
+.func-card-wide {
+  flex: 0 0 100%;
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 9px;
+}
+.card-icon {
+  width: 36px;
+  height: 36px;
+  background-color: rgba(35,134,54,0.15);
+  border: 1px solid rgba(35,134,54,0.3);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  color: #3fb950;
+  font-size: 16px;
+}
+.card-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #f0f6fc;
+  letter-spacing: 1px;
+}
+.card-desc {
+  font-size: 13px;
+  color: #8b949e;
+  line-height: 1.55;
+}
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.tag {
+  background-color: rgba(35,134,54,0.1);
+  border: 1px solid rgba(35,134,54,0.2);
+  color: #3fb950;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+/* 右侧速查表 */
+.right-section {
+  position: absolute;
+  right: 60px;
+  top: 160px;
+  width: 520px;
+}
+.checklist-card {
+  background-color: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.checklist-title {
+  font-size: 15px;
+  font-weight: bold;
+  color: #f0f6fc;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  letter-spacing: 1px;
+}
+.checklist-title::before {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 16px;
+  background-color: #238636;
+  border-radius: 2px;
+  margin-right: 12px;
+}
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(48,54,61,0.5);
+}
+.check-item:last-child { border-bottom: none; }
+.check-icon {
+  width: 20px;
+  height: 20px;
+  background-color: rgba(35,134,54,0.15);
+  border: 1px solid rgba(35,134,54,0.4);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.check-icon::after {
+  content: "✓";
+  color: #3fb950;
+  font-size: 11px;
+  font-weight: bold;
+}
+.check-text {
+  font-size: 13px;
+  color: #c9d1d9;
+  line-height: 1.5;
+}
+.check-text strong {
+  color: #58a6ff;
+}
+
+/* 代码块 */
+.code-block {
+  background-color: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+.code-title {
+  font-size: 12px;
+  color: #8b949e;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+.code-content {
+  font-size: 12px;
+  color: #7ee787;
+  line-height: 1.8;
+  font-family: "Courier New", monospace;
+}
+
+/* 数据统计 */
+.stats-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.stat-box {
+  flex: 1;
+  min-width: 0;
+  background-color: rgba(35,134,54,0.08);
+  border: 1px solid rgba(35,134,54,0.2);
+  border-radius: 6px;
+  padding: 10px 12px;
+  text-align: center;
+  box-sizing: border-box;
+}
+.stat-num {
+  font-size: 22px;
+  font-weight: bold;
+  color: #3fb950;
+}
+.stat-info {
+  font-size: 11px;
+  color: #8b949e;
+  margin-top: 4px;
+}
+
+/* 装饰 */
+.deco-ring {
+  position: absolute;
+  border: 1px solid rgba(35,134,54,0.1);
+  border-radius: 50%;
+  bottom: 40px;
+  left: 40px;
+  width: 160px;
+  height: 160px;
+}
+.deco-dots {
+  position: absolute;
+  bottom: 40px;
+  right: 60px;
+  display: flex;
+  gap: 6px;
+}
+.deco-line {
+  width: 3px;
+  height: 30px;
+  background-color: rgba(35,134,54,0.3);
+  border-radius: 2px;
+}
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="top-bar"></div>
+  
+  <div class="header">
+    <div class="title-group">
+      <h1>核心功能特性</h1>
+      <p>强大的HTML到PPT转换能力</p>
+      <div class="title-line"></div>
+    </div>
+    <div class="header-badge">10+ 核心功能</div>
+  </div>
+
+  <div class="cards-section">
+    <div class="card-row">
+      <div class="func-card">
+        <div class="card-header">
+          <div class="card-icon">◈</div>
+          <div class="card-title">元素提取</div>
+        </div>
+        <div class="card-desc">完整的DOM元素解析，精确坐标与尺寸提取，支持富文本样式解析</div>
+        <div class="tag-list">
+          <span class="tag">坐标定位</span>
+          <span class="tag">尺寸提取</span>
+          <span class="tag">伪元素</span>
+        </div>
+      </div>
+      <div class="func-card">
+        <div class="card-header">
+          <div class="card-icon">◈</div>
+          <div class="card-title">样式转换</div>
+        </div>
+        <div class="card-desc">支持颜色、背景、边框、圆角、透明度，支持字体、字号、粗细</div>
+        <div class="tag-list">
+          <span class="tag">CSS解析</span>
+          <span class="tag">样式还原</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-row">
+      <div class="func-card">
+        <div class="card-header">
+          <div class="card-icon">◈</div>
+          <div class="card-title">布局还原</div>
+        </div>
+        <div class="card-desc">精确还原绝对定位和flex布局，支持多种容器元素</div>
+        <div class="tag-list">
+          <span class="tag">绝对定位</span>
+          <span class="tag">Flex布局</span>
+        </div>
+      </div>
+      <div class="func-card">
+        <div class="card-header">
+          <div class="card-icon">◈</div>
+          <div class="card-title">丰富元素</div>
+        </div>
+        <div class="card-desc">文本、标题、列表、图片、SVG图形、表格、线条、圆形</div>
+        <div class="tag-list">
+          <span class="tag">表格</span>
+          <span class="tag">SVG</span>
+          <span class="tag">图片</span>
+        </div>
+      </div>
+    </div>
+    <div class="func-card func-card-wide">
+      <div class="card-header">
+        <div class="card-icon">◈</div>
+        <div class="card-title">灵活配置</div>
+      </div>
+      <div class="card-desc">自定义缩放系数，详细日志输出，批量处理支持，目录自动扫描</div>
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-num">0.75</div>
+          <div class="stat-info">默认缩放</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">∞</div>
+          <div class="stat-info">批量数量</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">100%</div>
+          <div class="stat-info">保真度</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">CLI</div>
+          <div class="stat-info">命令行</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="right-section">
+    <div class="checklist-card">
+      <div class="checklist-title">支持HTML元素</div>
+      <div class="check-item">
+        <div class="check-icon"></div>
+        <div class="check-text"><strong>文本类：</strong>h1-h6, p, span, a, li</div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon"></div>
+        <div class="check-text"><strong>容器类：</strong>div, section</div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon"></div>
+        <div class="check-text"><strong>表格类：</strong>table, tr, td, th</div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon"></div>
+        <div class="check-text"><strong>媒体类：</strong>img, svg</div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon"></div>
+        <div class="check-text"><strong>列表类：</strong>ul, ol</div>
+      </div>
+    </div>
+
+    <div class="checklist-card">
+      <div class="checklist-title">支持的CSS样式</div>
+      <div class="code-block">
+        <div class="code-title">&lt; 核心样式属性 &gt;</div>
+        <div class="code-content">
+          background-color, border<br>
+          border-radius, opacity<br>
+          font-family, font-size<br>
+          font-weight, color<br>
+          text-align, line-height
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="deco-ring"></div>
+  <div class="deco-dots">
+    <div class="deco-line"></div>
+    <div class="deco-line"></div>
+    <div class="deco-line"></div>
+  </div>
+</div>
+</body>
+</html>

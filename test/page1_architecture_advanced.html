@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>html2pptx系统架构</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  width: 1280px;
+  height: 720px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #2d333b 0%, #161b22 40%, #0d1117 70%, #000000 100%);
+  font-family: "Microsoft YaHei", Arial, sans-serif;
+}
+.slide {
+  width: 1280px;
+  height: 720px;
+  position: relative;
+  padding: 0;
+}
+
+/* 顶部装饰条 */
+.top-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: #58a6ff;
+}
+
+/* 标题区 */
+.header {
+  position: absolute;
+  top: 40px;
+  left: 60px;
+  right: 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.title-group {
+  max-width: 700px;
+}
+.title-group h1 {
+  font-size: 44px;
+  color: #f0f6fc;
+  font-weight: bold;
+  letter-spacing: 3px;
+  margin-bottom: 8px;
+}
+.title-group p {
+  font-size: 16px;
+  color: #8b949e;
+  letter-spacing: 1px;
+}
+.title-line {
+  width: 50px;
+  height: 3px;
+  background-color: #58a6ff;
+  margin-top: 14px;
+}
+
+/* 统计区域 */
+.stats-area {
+  display: flex;
+  gap: 40px;
+  margin-top: 8px;
+}
+.stat-item {
+  text-align: center;
+  padding: 0 20px;
+  border-right: 1px solid rgba(88,166,255,0.2);
+}
+.stat-item:last-child { border-right: none; }
+.stat-number {
+  font-size: 28px;
+  font-weight: bold;
+  color: #58a6ff;
+  letter-spacing: 2px;
+}
+.stat-label {
+  font-size: 12px;
+  color: #8b949e;
+  margin-top: 4px;
+  letter-spacing: 1px;
+}
+
+/* 左侧架构区 */
+.left-section {
+  position: absolute;
+  left: 60px;
+  top: 160px;
+  width: 560px;
+}
+.layer-block {
+  margin-bottom: 14px;
+  position: relative;
+}
+.layer-label {
+  display: inline-block;
+  background-color: #161b22;
+  border: 1px solid #30363d;
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  padding: 8px 20px;
+  font-size: 13px;
+  color: #c9d1d9;
+  font-weight: bold;
+  letter-spacing: 1px;
+  position: relative;
+}
+.layer-label::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #58a6ff, #1f6feb);
+}
+.layer-content {
+  background-color: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 0 8px 8px 8px;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.layer-item {
+  flex: 1;
+  background-color: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 14px 12px;
+  text-align: center;
+  font-size: 13px;
+  color: #c9d1d9;
+  position: relative;
+}
+.layer-item::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 2px;
+  background-color: #58a6ff;
+  border-radius: 2px;
+}
+
+.flow-arrow {
+  text-align: center;
+  color: #58a6ff;
+  font-size: 16px;
+  padding: 4px 0;
+  opacity: 0.6;
+}
+
+/* 版本信息 */
+.version-bar {
+  background-color: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 10px 20px;
+  margin-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.version-text {
+  font-size: 13px;
+  color: #8b949e;
+  letter-spacing: 1px;
+}
+.version-badge {
+  background-color: rgba(88,166,255,0.15);
+  border: 1px solid rgba(88,166,255,0.3);
+  color: #58a6ff;
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  letter-spacing: 1px;
+}
+
+/* 右侧技术栈区 */
+.right-section {
+  position: absolute;
+  right: 60px;
+  top: 160px;
+  width: 520px;
+}
+.section-card {
+  background-color: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  position: relative;
+}
+.section-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 24px;
+  right: 24px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #58a6ff, transparent);
+  opacity: 0.5;
+}
+.card-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #f0f6fc;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  letter-spacing: 1px;
+}
+.card-title::before {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 16px;
+  background-color: #58a6ff;
+  border-radius: 2px;
+  margin-right: 12px;
+}
+.tech-row {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(48,54,61,0.5);
+}
+.tech-row:last-child { border-bottom: none; }
+.tech-name {
+  font-size: 14px;
+  color: #58a6ff;
+  font-weight: bold;
+  width: 140px;
+}
+.tech-desc {
+  font-size: 13px;
+  color: #8b949e;
+  flex: 1;
+}
+.tech-version {
+  font-size: 12px;
+  color: #6e7681;
+  background-color: #0d1117;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.feature-row {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+}
+.feature-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #238636;
+  border-radius: 50%;
+  margin-right: 12px;
+}
+.feature-text {
+  font-size: 13px;
+  color: #c9d1d9;
+  line-height: 1.5;
+}
+.feature-highlight {
+  color: #58a6ff;
+  font-weight: bold;
+}
+
+/* 装饰元素 */
+.deco-circle {
+  position: absolute;
+  border: 1px solid rgba(88,166,255,0.1);
+  border-radius: 50%;
+}
+.deco-1 {
+  width: 200px;
+  height: 200px;
+  bottom: 80px;
+  left: 30px;
+}
+.deco-2 {
+  width: 100px;
+  height: 100px;
+  bottom: 120px;
+  left: 180px;
+  background-color: rgba(88,166,255,0.02);
+}
+.deco-grid {
+  position: absolute;
+  bottom: 60px;
+  right: 60px;
+  display: grid;
+  grid-template-columns: repeat(5, 8px);
+  gap: 8px;
+}
+.grid-dot {
+  width: 3px;
+  height: 3px;
+  background-color: rgba(88,166,255,0.3);
+  border-radius: 50%;
+}
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="top-bar"></div>
+  
+  <div class="header">
+    <div class="title-group">
+      <h1>html2pptx 系统架构</h1>
+      <p>纯静态HTML+CSS → 可编辑PPT转换工具</p>
+      <div class="title-line"></div>
+    </div>
+    <div class="stats-area">
+      <div class="stat-item">
+        <div class="stat-number">3</div>
+        <div class="stat-label">核心层级</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">4+</div>
+        <div class="stat-label">技术栈</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">100%</div>
+        <div class="stat-label">可编辑</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="left-section">
+    <div class="layer-block">
+      <div class="layer-label">输入层 (Input Layer)</div>
+      <div class="layer-content">
+        <div class="layer-item">HTML文件</div>
+        <div class="layer-item">目录批量转换</div>
+        <div class="layer-item">多文件合并</div>
+      </div>
+    </div>
+    <div class="flow-arrow">▼</div>
+    <div class="layer-block">
+      <div class="layer-label">处理层 (Processing Layer)</div>
+      <div class="layer-content">
+        <div class="layer-item">Puppeteer元素提取</div>
+        <div class="layer-item">样式解析与转换</div>
+        <div class="layer-item">坐标与尺寸计算</div>
+      </div>
+    </div>
+    <div class="flow-arrow">▼</div>
+    <div class="layer-block">
+      <div class="layer-label">输出层 (Output Layer)</div>
+      <div class="layer-content">
+        <div class="layer-item">PptxGenJS生成</div>
+        <div class="layer-item">pptx文件输出</div>
+        <div class="layer-item">可编辑演示文稿</div>
+      </div>
+    </div>
+    <div class="version-bar">
+      <div class="version-text">项目版本：v1.0.0 | 版权信息归项目方所有</div>
+      <div class="version-badge">MIT License</div>
+    </div>
+  </div>
+
+  <div class="right-section">
+    <div class="section-card">
+      <div class="card-title">核心技术栈</div>
+      <div class="tech-row">
+        <div class="tech-name">Node.js</div>
+        <div class="tech-desc">≥ 18.0.0 运行环境</div>
+        <div class="tech-version">v18+</div>
+      </div>
+      <div class="tech-row">
+        <div class="tech-name">Puppeteer</div>
+        <div class="tech-desc">最新版 浏览器自动化与元素提取</div>
+        <div class="tech-version">Latest</div>
+      </div>
+      <div class="tech-row">
+        <div class="tech-name">PptxGenJS</div>
+        <div class="tech-desc">3.12.0 PPT文件生成</div>
+        <div class="tech-version">v3.12</div>
+      </div>
+      <div class="tech-row">
+        <div class="tech-name">Commander</div>
+        <div class="tech-desc">12.0.0 CLI命令行解析</div>
+        <div class="tech-version">v12</div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="card-title">架构特点</div>
+      <div class="feature-row">
+        <div class="feature-dot"></div>
+        <div class="feature-text"><span class="feature-highlight">高内聚低耦合：</span>三层独立，易于扩展</div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-dot"></div>
+        <div class="feature-text"><span class="feature-highlight">高保真还原：</span>精确坐标定位</div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-dot"></div>
+        <div class="feature-text"><span class="feature-highlight">可编辑输出：</span>生成的PPT完全可编辑</div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-dot"></div>
+        <div class="feature-text"><span class="feature-highlight">批量处理：</span>支持单文件、多文件、目录转换</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="deco-circle deco-1"></div>
+  <div class="deco-circle deco-2"></div>
+  <div class="deco-grid">
+    <div class="grid-dot"></div><div class="grid-dot"></div><div class="grid-dot"></div><div class="grid-dot"></div><div class="grid-dot"></div>
+    <div class="grid-dot"></div><div class="grid-dot"></div><div class="grid-dot"></div><div class="grid-dot"></div><div class="grid-dot"></div>
+    <div class="grid-dot"></div><div class="grid-dot"></div><div class="grid-dot"></div><div class="grid-dot"></div><div class="grid-dot"></div>
+    <div class="grid-dot"></div><div class="grid-dot"></div><div class="grid-dot"></div><div class="grid-dot"></div><div class="grid-dot"></div>
+  </div>
+</div>
+</body>
+</html>

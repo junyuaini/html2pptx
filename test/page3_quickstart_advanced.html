@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>快速上手使用</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  width: 1280px;
+  height: 720px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #2d333b 0%, #161b22 40%, #0d1117 70%, #000000 100%);
+  font-family: "Microsoft YaHei", Arial, sans-serif;
+}
+.slide {
+  width: 1280px;
+  height: 720px;
+  position: relative;
+  padding: 0;
+}
+
+/* 顶部装饰条 */
+.top-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: #da3633;
+}
+
+/* 标题区 */
+.header {
+  position: absolute;
+  top: 40px;
+  left: 60px;
+  right: 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.title-group h1 {
+  font-size: 44px;
+  color: #f0f6fc;
+  font-weight: bold;
+  letter-spacing: 3px;
+  margin-bottom: 8px;
+}
+.title-group p {
+  font-size: 16px;
+  color: #8b949e;
+  letter-spacing: 1px;
+}
+.title-line {
+  width: 50px;
+  height: 3px;
+  background-color: #da3633;
+  margin-top: 14px;
+}
+.header-steps {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+.step-badge {
+  background-color: rgba(218,54,51,0.15);
+  border: 1px solid rgba(218,54,51,0.3);
+  color: #f85149;
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  letter-spacing: 1px;
+}
+
+/* 左侧安装区 */
+.left-section {
+  position: absolute;
+  left: 60px;
+  top: 160px;
+  width: 560px;
+}
+.install-card {
+  background-color: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  position: relative;
+}
+.install-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 24px;
+  right: 24px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #da3633, transparent);
+  opacity: 0.6;
+}
+.card-tag {
+  display: inline-block;
+  background-color: rgba(218,54,51,0.12);
+  border: 1px solid rgba(218,54,51,0.3);
+  color: #f85149;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 6px 14px;
+  border-radius: 6px;
+  margin-bottom: 14px;
+  letter-spacing: 1px;
+}
+.step-row {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(48,54,61,0.5);
+}
+.step-row:last-child { border-bottom: none; }
+.step-num {
+  width: 28px;
+  height: 28px;
+  background-color: rgba(218,54,51,0.15);
+  border: 1px solid rgba(218,54,51,0.4);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: bold;
+  color: #f85149;
+  margin-right: 14px;
+  flex-shrink: 0;
+}
+.step-text {
+  font-size: 14px;
+  color: #c9d1d9;
+  line-height: 1.5;
+}
+.step-text code {
+  background-color: #0d1117;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-family: "Courier New", monospace;
+  color: #ffa657;
+  font-size: 13px;
+  border: 1px solid #30363d;
+  margin-left: 6px;
+}
+
+/* 示例区 */
+.example-card {
+  background-color: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 10px;
+  padding: 18px 22px;
+  margin-bottom: 16px;
+}
+.example-title {
+  font-size: 13px;
+  color: #8b949e;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+.example-row {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+}
+.example-label {
+  font-size: 12px;
+  color: #f85149;
+  font-weight: bold;
+  width: 60px;
+}
+.example-code {
+  font-size: 12px;
+  color: #ffa657;
+  font-family: "Courier New", monospace;
+  background-color: #0d1117;
+  padding: 6px 12px;
+  border-radius: 4px;
+  border: 1px solid #30363d;
+  flex: 1;
+}
+
+/* 右侧参数表 */
+.right-section {
+  position: absolute;
+  right: 60px;
+  top: 160px;
+  width: 520px;
+}
+.param-card {
+  background-color: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.param-header {
+  background: linear-gradient(90deg, rgba(218,54,51,0.1), transparent);
+  padding: 14px 20px;
+  font-size: 15px;
+  font-weight: bold;
+  color: #f0f6fc;
+  letter-spacing: 1px;
+  border-bottom: 1px solid #30363d;
+  display: flex;
+  align-items: center;
+}
+.param-header::before {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 16px;
+  background-color: #da3633;
+  border-radius: 2px;
+  margin-right: 12px;
+}
+.param-table {
+  padding: 0;
+}
+.param-row {
+  display: flex;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(48,54,61,0.5);
+  align-items: center;
+}
+.param-row:last-child { border-bottom: none; }
+.param-row:first-child {
+  background-color: rgba(218,54,51,0.05);
+}
+.param-key {
+  width: 130px;
+  font-size: 13px;
+  color: #ffa657;
+  font-family: "Courier New", monospace;
+}
+.param-desc {
+  width: 230px;
+  font-size: 13px;
+  color: #8b949e;
+}
+.param-default {
+  width: 90px;
+  font-size: 12px;
+  color: #6e7681;
+  text-align: right;
+}
+
+/* 规范卡片 */
+.spec-card {
+  background-color: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.spec-header {
+  padding: 14px 20px;
+  font-size: 15px;
+  font-weight: bold;
+  color: #f0f6fc;
+  letter-spacing: 1px;
+  border-bottom: 1px solid #30363d;
+  display: flex;
+  align-items: center;
+}
+.spec-header::before {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 16px;
+  background-color: #da3633;
+  border-radius: 2px;
+  margin-right: 12px;
+}
+.spec-list {
+  padding: 12px 16px;
+}
+.spec-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  font-size: 13px;
+  color: #c9d1d9;
+}
+.spec-icon {
+  width: 18px;
+  height: 18px;
+  background-color: rgba(218,54,51,0.15);
+  border: 1px solid rgba(218,54,51,0.3);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+.spec-icon::after {
+  content: "✓";
+  color: #f85149;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+/* 装饰 */
+.deco-square {
+  position: absolute;
+  border: 1px solid rgba(218,54,51,0.1);
+  border-radius: 4px;
+  bottom: 60px;
+  left: 50px;
+  width: 80px;
+  height: 80px;
+  transform: rotate(45deg);
+}
+.deco-lines {
+  position: absolute;
+  bottom: 60px;
+  right: 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+}
+.deco-line {
+  height: 3px;
+  background-color: rgba(218,54,51,0.3);
+  border-radius: 2px;
+}
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="top-bar"></div>
+  
+  <div class="header">
+    <div class="title-group">
+      <h1>快速上手使用</h1>
+      <p>3步完成HTML到PPT转换</p>
+      <div class="title-line"></div>
+    </div>
+    <div class="header-steps">
+      <span class="step-badge">即装即用</span>
+      <span class="step-badge">CLI工具</span>
+      <span class="step-badge">批量支持</span>
+    </div>
+  </div>
+
+  <div class="left-section">
+    <div class="install-card">
+      <div class="card-tag">安装步骤</div>
+      <div class="step-row">
+        <div class="step-num">1</div>
+        <div class="step-text">进入项目目录 <code>cd html2pptx</code></div>
+      </div>
+      <div class="step-row">
+        <div class="step-num">2</div>
+        <div class="step-text">安装依赖 <code>npm install</code></div>
+      </div>
+      <div class="step-row">
+        <div class="step-num">3</div>
+        <div class="step-text">开始使用 <code>node src/cli.js</code></div>
+      </div>
+    </div>
+
+    <div class="example-card">
+      <div class="example-title">&lt; 使用示例 &gt;</div>
+      <div class="example-row">
+        <div class="example-label">示例1</div>
+        <div class="example-code">node src/cli.js test/cover.html -o output.pptx</div>
+      </div>
+      <div class="example-row">
+        <div class="example-label">示例2</div>
+        <div class="example-code">node src/cli.js slide1.html slide2.html -o output.pptx</div>
+      </div>
+      <div class="example-row">
+        <div class="example-label">示例3</div>
+        <div class="example-code">node src/cli.js ./slides/ -o output.pptx --verbose</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="right-section">
+    <div class="param-card">
+      <div class="param-header">参数说明表格</div>
+      <div class="param-table">
+        <div class="param-row">
+          <div class="param-key">inputs</div>
+          <div class="param-desc">HTML文件/目录路径</div>
+          <div class="param-default">必填</div>
+        </div>
+        <div class="param-row">
+          <div class="param-key">-o, --output</div>
+          <div class="param-desc">输出.pptx文件路径</div>
+          <div class="param-default">output.pptx</div>
+        </div>
+        <div class="param-row">
+          <div class="param-key">-s, --scale</div>
+          <div class="param-desc">px→pt缩放系数</div>
+          <div class="param-default">0.75</div>
+        </div>
+        <div class="param-row">
+          <div class="param-key">-v, --verbose</div>
+          <div class="param-desc">显示详细日志</div>
+          <div class="param-default">false</div>
+        </div>
+        <div class="param-row">
+          <div class="param-key">-V, --version</div>
+          <div class="param-desc">显示版本号</div>
+          <div class="param-default">false</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="spec-card">
+      <div class="spec-header">HTML输入规范</div>
+      <div class="spec-list">
+        <div class="spec-item">
+          <div class="spec-icon"></div>
+          <div>纯静态HTML+CSS（不含JavaScript）</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-icon"></div>
+          <div>页面尺寸固定1280×720px</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-icon"></div>
+          <div>字体使用白名单字体（微软雅黑等）</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-icon"></div>
+          <div>颜色使用纯色（十六进制或RGB）</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-icon"></div>
+          <div>图片使用绝对URL</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="deco-square"></div>
+  <div class="deco-lines">
+    <div class="deco-line" style="width: 60px;"></div>
+    <div class="deco-line" style="width: 40px;"></div>
+    <div class="deco-line" style="width: 80px;"></div>
+  </div>
+</div>
+</body>
+</html>

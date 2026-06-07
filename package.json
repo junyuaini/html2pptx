@@ -1,0 +1,49 @@
+{
+  "name": "html2pptx",
+  "version": "1.1.0",
+  "description": "Convert static HTML/CSS pages to editable PowerPoint (.pptx) presentations",
+  "main": "src/index.js",
+  "bin": {
+    "html2pptx": "src/cli.js"
+  },
+  "files": [
+    "src/",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node src/cli.js test/cover.html test/content1.html test/content2.html -o test/output.pptx -v"
+  },
+  "keywords": [
+    "html",
+    "pptx",
+    "powerpoint",
+    "converter",
+    "html-to-pptx",
+    "presentation",
+    "puppeteer",
+    "pptxgenjs",
+    "cli",
+    "slide"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/junyuaini/html2pptx"
+  },
+  "bugs": {
+    "url": "https://github.com/junyuaini/html2pptx/issues"
+  },
+  "homepage": "https://github.com/junyuaini/html2pptx#readme",
+  "dependencies": {
+    "commander": "^12.0.0",
+    "jszip": "^3.10.1",
+    "pptxgenjs": "^3.12.0",
+    "puppeteer": "^24.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "MIT"
+}

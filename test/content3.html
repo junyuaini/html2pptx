@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 1280px; height: 720px; font-family: "Microsoft YaHei", Arial; }
+  .slide {
+    width: 1280px;
+    height: 720px;
+    position: relative;
+    background-color: #FFFFFF;
+  }
+  .header-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1280px;
+    height: 60px;
+    background-color: #1A3A5C;
+  }
+  .header-title {
+    position: absolute;
+    top: 12px;
+    left: 40px;
+    font-size: 28px;
+    color: #FFFFFF;
+    font-weight: bold;
+  }
+
+  /* === h1-h6 标题测试 === */
+  .h1-area {
+    position: absolute;
+    top: 80px;
+    left: 60px;
+    width: 540px;
+  }
+  .h2-area {
+    position: absolute;
+    top: 130px;
+    left: 60px;
+    width: 540px;
+  }
+  .h3-area {
+    position: absolute;
+    top: 170px;
+    left: 60px;
+    width: 540px;
+  }
+
+  /* === p 段落测试 === */
+  .p-area {
+    position: absolute;
+    top: 220px;
+    left: 60px;
+    width: 540px;
+  }
+
+  /* === 富文本测试（b/i/u/span） === */
+  .rich-text-area {
+    position: absolute;
+    top: 300px;
+    left: 60px;
+    width: 540px;
+  }
+
+  /* === hr 分割线测试 === */
+  .hr-area {
+    position: absolute;
+    top: 380px;
+    left: 60px;
+    width: 540px;
+  }
+
+  /* === a 超链接测试 === */
+  .link-area {
+    position: absolute;
+    top: 410px;
+    left: 60px;
+    width: 540px;
+  }
+
+  /* === img 图片占位框测试 === */
+  .img-area {
+    position: absolute;
+    top: 80px;
+    left: 660px;
+    width: 540px;
+    height: 300px;
+  }
+
+  /* === ul/ol 列表测试 === */
+  .ul-area {
+    position: absolute;
+    top: 420px;
+    left: 60px;
+    width: 540px;
+  }
+
+  /* === 形状（带圆角、不同背景色） === */
+  .shape1 {
+    position: absolute;
+    top: 420px;
+    left: 660px;
+    width: 250px;
+    height: 100px;
+    background-color: #E8F4FD;
+    border-radius: 12px;
+  }
+  .shape2 {
+    position: absolute;
+    top: 420px;
+    left: 950px;
+    width: 250px;
+    height: 100px;
+    background-color: #FFF3E0;
+    border-radius: 12px;
+  }
+
+  /* === 页码 === */
+  .page-number {
+    position: absolute;
+    bottom: 20px;
+    right: 40px;
+    font-size: 14px;
+    color: #999999;
+  }
+</style>
+</head>
+<body>
+<div class="slide">
+  <!-- 顶部栏 -->
+  <div class="header-bar"></div>
+  <div class="header-title">功能测试页</div>
+
+  <!-- h1 标题 -->
+  <div class="h1-area">
+    <h1 style="font-size: 36px; color: #1A3A5C;">H1 一级标题测试</h1>
+  </div>
+
+  <!-- h2 标题 -->
+  <div class="h2-area">
+    <h2 style="font-size: 28px; color: #2A5A8C;">H2 二级标题测试</h2>
+  </div>
+
+  <!-- h3 标题 -->
+  <div class="h3-area">
+    <h3 style="font-size: 22px; color: #3A7ABC;">H3 三级标题测试</h3>
+  </div>
+
+  <!-- p 段落 -->
+  <div class="p-area">
+    <p style="font-size: 16px; color: #444444; line-height: 1.6;">这是一段普通的段落文字，用于测试 P 标签的转换效果。段落支持多行文本，文字会自动换行显示。</p>
+  </div>
+
+  <!-- 富文本：b/i/u/span -->
+  <div class="rich-text-area">
+    <p style="font-size: 18px; color: #333333;">这是<b>加粗文字</b>、这是<i>斜体文字</i>、这是<u>下划线文字</b>、这是<span style="color: #FF6600;">橙色文字</span>、这是<span style="font-size: 24px;">大号文字</span>。</p>
+  </div>
+
+  <!-- hr 分割线 -->
+  <div class="hr-area">
+    <hr style="border: none; border-top: 2px solid #CCCCCC; width: 540px;">
+  </div>
+
+  <!-- a 超链接 -->
+  <div class="link-area">
+    <a href="https://www.example.com" style="font-size: 16px; color: #1A6FB5;">点击访问示例网站 https://www.example.com</a>
+  </div>
+
+  <!-- ul 列表 -->
+  <div class="ul-area">
+    <ul style="font-size: 16px; color: #444444;">
+      <li>列表项一：支持无序列表</li>
+      <li>列表项二：每项独立显示</li>
+      <li>列表项三：文字可编辑</li>
+    </ul>
+  </div>
+
+  <!-- img 图片占位框 -->
+  <div class="img-area">
+    <img src="https://www.example.com/demo-image.jpg" style="width: 540px; height: 300px;">
+  </div>
+
+  <!-- 形状 -->
+  <div class="shape1"></div>
+  <div class="shape2"></div>
+
+  <!-- 页码 -->
+  <div class="page-number">4 / 4</div>
+</div>
+</body>
+</html>
