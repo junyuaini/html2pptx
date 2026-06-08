@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2026-06-08 (Planned)
+
+### Added
+- Documentation updates clarifying pseudo-element support limitations
+
+### Changed
+- Updated user guidance: recommend real DOM elements for critical visual decorations (list markers, icons)
+- Enhanced documentation for better conversion reliability
+
+### Fixed
+- N/A (Documentation improvements based on user feedback)
+
 ## [1.1.0] - 2026-06-07
 
 ### Added

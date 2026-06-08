@@ -18,7 +18,8 @@
 - **Tables** — table, tr, td, th with cell-level styles and row heights
 - **Images & SVG** — img elements and inline SVG converted to embedded images
 - **CSS Gradients** — linear-gradient with multiple color stops, angles, and transparency → native OOXML gradFill
-- **Pseudo-elements** — ::before and ::after with position, background, border, and text content
+- **Pseudo-elements** — ::before and ::after with position, background, border, and text content  
+  *Note: Support for pseudo-elements is limited. For critical visual elements (list markers, icons), use real DOM elements for better conversion reliability.*
 - **CSS Transforms** — rotate, translate, scale
 - **Batch Processing** — single file, multiple files, or entire directory
 
@@ -117,7 +118,7 @@ HTML File(s)
 | **Containers** | div, section, article, header, footer, main, nav, aside |
 | **Tables** | table, tr, td, th, thead, tbody, caption |
 | **Media** | img, svg |
-| **Decorations** | hr, ::before, ::after |
+| **Decorations** | hr, ::before, ::after (limited support - use real elements for critical visuals) |
 | **Background** | background-color, linear-gradient |
 | **Border** | border, border-radius, individual side borders |
 | **Typography** | font-family, font-size, font-weight, font-style, color, text-align, line-height, text-decoration |

@@ -14,7 +14,7 @@
   ],
   "scripts": {
     "start": "node src/cli.js",
-    "test": "node src/cli.js test/cover.html test/content1.html test/content2.html -o test/output.pptx -v"
+    "test": "node src/cli.js test/cover.html test/content1.html test/content2.html -o test/output.pptx --verbose"
   },
   "keywords": [
     "html",

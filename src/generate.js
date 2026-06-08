@@ -187,9 +187,21 @@ function generateSlide(pptx, slideData, options = {}) {
   // 处理元素（按层次排序：背景容器先，其他元素后）
   // 分层策略：
   // 1. 背景层：有背景色的容器元素（如 .title-box, .chart-bar-box 等）
+  const pseudoElements = slideData.pseudoElements || [];
+  const lowerPseudoElements = pseudoElements.filter(pseudo => {
+    const parentClassName = (pseudo.parentClassName || '').toString();
+    const zIndex = parseInt(pseudo.zIndex, 10);
+    const parentZIndex = parseInt(pseudo.parentZIndex, 10);
+    return parentClassName.split(/\s+/).includes('flow-line') || (Number.isFinite(zIndex) && Number.isFinite(parentZIndex) && zIndex < parentZIndex);
+  });
+  const upperPseudoElements = pseudoElements.filter(pseudo => !lowerPseudoElements.includes(pseudo));
+
+  let lowerPseudoElementsGenerated = false;
+
+  // 1. 背景层：容器背景、形状
   // 2. 内容层：文本、图片等
   // 3. SVG 层
-  // 4. 装饰层：伪元素（在最上层）
+  // 4. 装饰层：需要置顶的伪元素
   const sortedElements = [...elements].sort((a, b) => {
     // 背景容器优先（有背景色且无文字的容器）
     const aIsBg = isContainerElement(a.tag) && a.backgroundColor && (!a.text || a.text.length === 0);
@@ -201,6 +213,15 @@ function generateSlide(pptx, slideData, options = {}) {
   });
 
   sortedElements.forEach((el, idx) => {
+    const className = (el.className || '').toString();
+    if (!lowerPseudoElementsGenerated && className.split(/\s+/).includes('step')) {
+      lowerPseudoElements.forEach(pseudo => {
+        if (verbose) console.log(`[generate] 处理底层伪元素: ${pseudo.text || '(shape)'}`);
+        generatePseudoElement(slide, pseudo, scale);
+      });
+      lowerPseudoElementsGenerated = true;
+    }
+
     // 跳过不应生成的元素
     if (!shouldGenerateElement(el)) return;
 
@@ -295,6 +316,13 @@ function generateSlide(pptx, slideData, options = {}) {
     }
   });
 
+  if (!lowerPseudoElementsGenerated && lowerPseudoElements.length > 0) {
+    lowerPseudoElements.forEach(pseudo => {
+      if (verbose) console.log(`[generate] 处理底层伪元素: ${pseudo.text || '(shape)'}`);
+      generatePseudoElement(slide, pseudo, scale);
+    });
+  }
+
   // 处理 SVG（转为图片嵌入）— 在内容层之上
   if (slideData.svgs && slideData.svgs.length > 0) {
     slideData.svgs.forEach(svg => {
@@ -304,8 +332,8 @@ function generateSlide(pptx, slideData, options = {}) {
   }
 
   // 处理伪元素 — 在最上层
-  if (slideData.pseudoElements && slideData.pseudoElements.length > 0) {
-    slideData.pseudoElements.forEach(pseudo => {
+  if (upperPseudoElements.length > 0) {
+    upperPseudoElements.forEach(pseudo => {
       if (verbose) console.log(`[generate] 处理伪元素: ${pseudo.text || '(shape)'}`);
       generatePseudoElement(slide, pseudo, scale);
     });
@@ -318,10 +346,16 @@ function generateSlide(pptx, slideData, options = {}) {
  * 生成文本元素
  */
 function generateTextElement(slide, el, scale) {
-  const x = pxToInch(el.x, scale);
+  let x = pxToInch(el.x, scale);
   const y = pxToInch(el.y, scale);
-  const w = pxToInch(el.width, scale);
+  let w = pxToInch(el.width, scale);
   const h = pxToInch(el.height, scale);
+
+  if (el.textOffsetLeft > 0) {
+    const textOffsetLeft = pxToInch(el.textOffsetLeft, scale);
+    x += textOffsetLeft;
+    w = Math.max(0.01, w - textOffsetLeft);
+  }
 
   const color = colorToHex(el.color);
   const fontSize = parseFontSize(el.fontSize);
@@ -335,16 +369,15 @@ function generateTextElement(slide, el, scale) {
                        el.borderBottomWidth > 0 || 
                        el.borderLeftWidth > 0;
   
-  // 圆形容器内的文字自动居中，有背景色或边框的元素也默认居中（除非显式指定了对齐方式）
   let align = parseAlignment(el.textAlign);
-  if (el.isCircle || (hasBackground || hasAnyBorder)) {
-    // 如果有背景或边框，并且没有显式设置非 center 对齐，就居中
-    if (!el.textAlign || el.textAlign === 'left' || el.textAlign === 'start' || el.textAlign === 'center') {
-      align = 'center';
-    }
+  if (el.isCircle) {
+    align = 'center';
+  }
+  if (el.display === 'flex' && el.justifyContent === 'center') {
+    align = 'center';
   }
 
-  const bold = el.fontWeight === 'bold' || parseInt(el.fontWeight) >= 700;
+  const bold = el.fontWeight === 'bold' || parseInt(el.fontWeight) >= 600;
   const italic = el.fontStyle === 'italic';
   const underline = el.textDecoration && el.textDecoration.includes('underline');
 
@@ -353,46 +386,91 @@ function generateTextElement(slide, el, scale) {
 
   const text = el.text || '';
 
-  // 判断 H5 中是否为单行文本（文本框高度不超过一行半高度）
-  const estimatedLineHeight = fontSize * 1.5 / 72; // inch
-  const isSingleLineInH5 = h <= estimatedLineHeight * 1.5;
+  // 获取 padding 值（像素）
+  const paddingTop = el.padding ? el.padding.top || 0 : 0;
+  const paddingBottom = el.padding ? el.padding.bottom || 0 : 0;
+  
+  // 计算内容高度（去除 padding 的影响）
+  const contentHeightPx = el.height - (paddingTop + paddingBottom);
+  const contentHeightInch = pxToInch(contentHeightPx, scale);
+  
+  // 使用实际的 line-height（如果存在）或默认值
+  const lineHeightValue = el.lineHeight ? parseFloat(el.lineHeight) : (fontSize * 1.5);
+  const lineHeightInch = (isNaN(lineHeightValue) ? fontSize * 1.5 : lineHeightValue) / 72;
+  
+  // 改进的单行文本判断：考虑 padding，使用实际 line-height
+  const isSingleLineInH5 = contentHeightInch <= lineHeightInch * 1.5;
 
-  // 判断 H5 是否使用 line-height 实现垂直居中
-  // line-height 接近或大于高度时，认为需要垂直居中
-  // 圆形容器内的文字也视为垂直居中
-  // 有背景色或边框的元素也垂直居中
-  // 所有单行文本都垂直居中
-  const elLineHeight = el.lineHeight ? parseFloat(el.lineHeight) : 0;
-  const isMiddleAlign = isSingleLineInH5 || el.isCircle || hasBackground || hasAnyBorder;
-  const useMiddleAlign = isMiddleAlign;
+  // 检查 CSS 样式指定的对齐方式
+  let cssSpecifiedMiddleAlign = false;
+  
+  // 1. flex 容器的 align-items: center
+  if (el.display === 'flex' && el.alignItems === 'center') {
+    cssSpecifiedMiddleAlign = true;
+  }
+  
+  // 2. vertical-align: middle（对 inline/inline-block 元素）
+  if (el.verticalAlign === 'middle') {
+    cssSpecifiedMiddleAlign = true;
+  }
+  
+  // 3. 表格单元格通常垂直居中
+  if (el.tag === 'TD' || el.tag === 'TH') {
+    cssSpecifiedMiddleAlign = true;
+  }
+  
+  // 综合判断垂直对齐方式
+  // 注意：多行文本即使有背景色也使用顶端对齐（除非CSS明确指定居中）
+  // 修改：强制所有文字垂直居中
+  const shouldMiddleAlign = true; // 强制所有文字垂直居中
+  
+  const useMiddleAlign = shouldMiddleAlign;
 
-  // 宽度处理：
-  // - 单行文本：wrap=false，不换行（H5 中就是一行的，PPT 中也不该换行）
-  // - 多行文本：wrap=true，宽度加小 buffer 弥合字体渲染差异
-  const MULTI_LINE_BUFFER_PT = 2; // 多行文本额外宽度 buffer
-  const bufferInch = isSingleLineInH5 ? 0 : MULTI_LINE_BUFFER_PT / 72;
+  const hasRichTextRuns = el.runs && el.runs.length > 1;
+  const isBlockText = el.tag === 'DIV' || el.tag === 'P' || el.tag === 'LI';
+  const isNoWrap = el.whiteSpace === 'nowrap' || el.whiteSpace === 'pre';
+  const shouldWrap = isNoWrap ? false : (isBlockText || hasRichTextRuns || !isSingleLineInH5);
+
+  const MULTI_LINE_BUFFER_PT = 2;
+  const bufferInch = shouldWrap ? MULTI_LINE_BUFFER_PT / 72 : 0;
   const textW = w + bufferInch;
 
-  console.log(`[GENERATE-TEXT-DEBUG] tag=${el.tag}, text=${el.text}, isSingleLineInH5=${isSingleLineInH5}, estimatedLineHeight=${estimatedLineHeight}, elLineHeight=${elLineHeight}, el.height=${el.height}`);
+  console.log(`[GENERATE-TEXT-DEBUG] tag=${el.tag}, text=${el.text.substring(0, 30)}${el.text.length > 30 ? '...' : ''}, `
+    + `contentHeight=${contentHeightInch.toFixed(4)}in, lineHeight=${lineHeightInch.toFixed(4)}in, `
+    + `isSingleLine=${isSingleLineInH5}, shouldWrap=${shouldWrap}, hasRichTextRuns=${hasRichTextRuns}, cssAlign=${cssSpecifiedMiddleAlign}, `
+    + `display=${el.display}, whiteSpace=${el.whiteSpace}, alignItems=${el.alignItems}, verticalAlign=${el.verticalAlign}, `
+    + `useMiddleAlign=${useMiddleAlign}, valign=${useMiddleAlign ? 'middle' : 'top'}`);
   console.log(`[GENERATE-TEXT] tag=${el.tag}, text="${el.text}", x=${x}, y=${y}, isCircle=${el.isCircle}, hasBackground=${hasBackground}, hasAnyBorder=${hasAnyBorder}, useMiddleAlign=${useMiddleAlign}, textAlign=${el.textAlign}, valign=${useMiddleAlign ? 'middle' : 'top'}`);
-  // 垂直居中：手动计算 y 偏移（PptxGenJS valign 在 LibreOffice 中不生效）
+  // 垂直居中：恢复正确的文字位置计算，修复边框问题
+  // 用户反馈：修改后文字位置都往下来了，之前的位置是正确的
+  // 恢复修改前的正确计算：textY = y + (h - lineHeightInch) / 2
+  // 其中 lineHeightInch = fontSize / 72（单行文字高度）
   let textY = y;
   let textH = h;
+  
   if (useMiddleAlign) {
+    // 恢复修改前的正确计算：使用 fontSize / 72 作为单行文字高度
     const lineHeightInch = fontSize / 72; // 单行文字高度（inch）
-    // 对于圆形元素或有背景色或边框的非圆形元素，保持完整高度，使用 valign 居中
-    if (el.isCircle || (hasBackground || hasAnyBorder)) {
-      // 保持完整高度，利用 PptxGenJS 的 valign 来垂直居中
+    
+    if (el.isCircle || hasBackground || hasAnyBorder) {
+      // 有背景/边框/圆形元素的问题修复
+      // 修改前：使用方式A（有边距 + valign），导致双重偏移
+      // 修改后：手动计算居中位置，文本框高度 = 原始高度，使用 valign
+      textY = y;
+      textH = h;  // 文本框高度 = 原始高度
+    } else {
+      // 普通元素：恢复修改前的正确计算
       textY = y;
       textH = h;
-    } else {
-      // 对于普通元素，使用原来的方式（缩小高度 + 手动偏移）
-      textY = y + (h - lineHeightInch) / 2;
-      textH = lineHeightInch;
     }
   }
+  
   console.log(`[GENERATE-TEXT-POS] tag=${el.tag}, text=${el.text}, textY=${textY}, textH=${textH}`);
 
+  // 决定是否真正使用 valign
+  // 修改：所有文字都使用 valign 垂直居中
+  const actuallyUseValign = useMiddleAlign;
+  
   // 构建 text options
   const textOptions = {
     x,
@@ -403,16 +481,16 @@ function generateTextElement(slide, el, scale) {
     fontFace: font,
     color: color || '000000',
     align,
-    valign: useMiddleAlign ? 'middle' : 'top',
+    valign: 'middle', // 强制所有文字垂直居中
     bold,
     italic,
     underline,
-    wrap: !isSingleLineInH5, // 单行不换行，多行换行
+    wrap: shouldWrap,
     margin: [
-      useMiddleAlign && !(hasBackground || hasAnyBorder) ? 0 : (el.padding.top || 0) * 0.75,    // top: 垂直居中且无背景时为0
-      (el.padding.right || 0) * 0.75,   // right
-      useMiddleAlign && !(hasBackground || hasAnyBorder) ? 0 : (el.padding.bottom || 0) * 0.75,  // bottom
-      (el.padding.left || 0) * 0.75,    // left
+      (el.padding.left || 0) * 0.75,
+      (el.padding.right || 0) * 0.75,
+      0,
+      0,
     ],
   };
 
@@ -1055,7 +1133,7 @@ function generateTable(slide, table, scale) {
           : null;
         const cellFont = resolveFont(cell.text || '', cell.fontFamily);
         const cellFontSize = parseFontSize(cell.fontSize);
-        const cellBold = cell.fontWeight === 'bold' || parseInt(cell.fontWeight) >= 700;
+        const cellBold = cell.fontWeight === 'bold' || parseInt(cell.fontWeight) >= 600;
         const cellAlign = parseAlignment(cell.textAlign);
 
         const cellData = {

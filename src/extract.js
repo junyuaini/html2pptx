@@ -115,6 +115,26 @@ async function extractFromHtml(htmlPath, options = {}, verbose = false) {
         }
       }
       const results = [];
+
+      function isDecorativeTextElement(el) {
+        const className = (el.className || '').toString();
+        return className.split(/\s+/).some(cls => ['li-dot', 'badge'].includes(cls));
+      }
+
+      function getTextWithoutDecorativeChildren(el) {
+        let text = '';
+        el.childNodes.forEach(node => {
+          if (node.nodeType === 3) {
+            text += node.textContent;
+            return;
+          }
+          if (node.nodeType === 1 && !isDecorativeTextElement(node)) {
+            text += node.innerText || node.textContent || '';
+          }
+        });
+        return text;
+      }
+
       const allElements = document.querySelectorAll('body *');
 
       allElements.forEach(el => {
@@ -130,7 +150,10 @@ async function extractFromHtml(htmlPath, options = {}, verbose = false) {
         // 提取文本内容（所有元素都尝试提取）
         let text = '';
         const directTextTags = ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'P', 'LI', 'SPAN', 'A', 'B', 'STRONG', 'I', 'EM', 'U', 'TD', 'TH', 'CAPTION'];
-        if (directTextTags.includes(tag)) {
+        const hasDecorativeTextChild = Array.from(el.children || []).some(child => isDecorativeTextElement(child));
+        if (directTextTags.includes(tag) && hasDecorativeTextChild) {
+          text = getTextWithoutDecorativeChildren(el);
+        } else if (directTextTags.includes(tag)) {
           text = el.innerText || el.textContent || '';
         } else {
           // 对于 DIV 等容器，只提取直接文本子节点（避免重复提取子元素文字）
@@ -202,6 +225,14 @@ async function extractFromHtml(htmlPath, options = {}, verbose = false) {
           finalY = centerY - cssH / 2;
         }
 
+        let textOffsetLeft = 0;
+        const firstDecorativeChild = Array.from(el.children).find(child => isDecorativeTextElement(child));
+        if (firstDecorativeChild) {
+          const childRect = firstDecorativeChild.getBoundingClientRect();
+          const childStyle = window.getComputedStyle(firstDecorativeChild);
+          textOffsetLeft = Math.max(0, (childRect.right - rect.left) + (parseFloat(childStyle.marginRight) || 0));
+        }
+
         results.push({
           tag,
           text,
@@ -212,6 +243,7 @@ async function extractFromHtml(htmlPath, options = {}, verbose = false) {
           y: finalY,
           width: finalWidth,
           height: finalHeight,
+          textOffsetLeft,
           color: style.color,
           fontSize: style.fontSize,
           fontFamily: style.fontFamily,
@@ -242,6 +274,13 @@ async function extractFromHtml(htmlPath, options = {}, verbose = false) {
           opacity: parseFloat(style.opacity),
           // CSS transform 信息（仅 rotation 当前会被 generate 阶段使用）
           rotation: transform.rotation,
+          // 布局相关样式（用于垂直对齐判断）
+          display: style.display,
+          justifyContent: style.justifyContent,
+          alignItems: style.alignItems,
+          verticalAlign: style.verticalAlign,
+          flexDirection: style.flexDirection,
+          whiteSpace: style.whiteSpace,
           padding: {
             top: parseFloat(style.paddingTop) || 0,
             right: parseFloat(style.paddingRight) || 0,
@@ -585,6 +624,10 @@ async function extractFromHtml(htmlPath, options = {}, verbose = false) {
               isDecorLine: isDecorLine,
               marginLeft: marginLeft,
               marginRight: marginRight,
+              pseudoType,
+              parentClassName: el.className || '',
+              zIndex: style.zIndex,
+              parentZIndex: window.getComputedStyle(el).zIndex,
             });
           }
         });
@@ -646,7 +689,7 @@ async function extractFromHtml(htmlPath, options = {}, verbose = false) {
               const cleanedText = text.trim().replace(/\s+/g, ' ');
               runs.push({
                 text: cleanedText,
-                bold: style.fontWeight === 'bold' || parseInt(style.fontWeight) >= 700,
+                bold: style.fontWeight === 'bold' || parseInt(style.fontWeight) >= 600,
                 italic: style.fontStyle === 'italic',
                 underline: style.textDecoration.includes('underline'),
                 color: style.color,
@@ -655,13 +698,15 @@ async function extractFromHtml(htmlPath, options = {}, verbose = false) {
               });
             }
           } else if (node.nodeType === 1) {
+            if (isDecorativeTextElement(node)) return;
+
             // 处理 <br> 标签：添加换行 run
             if (node.tagName === 'BR') {
               const style = inheritedStyle || window.getComputedStyle(element);
               runs.push({
                 text: '',
                 breakLine: true,
-                bold: style.fontWeight === 'bold' || parseInt(style.fontWeight) >= 700,
+                bold: style.fontWeight === 'bold' || parseInt(style.fontWeight) >= 600,
                 italic: style.fontStyle === 'italic',
                 underline: style.textDecoration.includes('underline'),
                 color: style.color,
@@ -687,7 +732,24 @@ async function extractFromHtml(htmlPath, options = {}, verbose = false) {
             const mergedStyle = mergeStyle(inheritedStyle, tagStyle);
 
             // 递归处理子节点
+            const beforeRunCount = runs.length;
             node.childNodes.forEach(child => processNode(child, mergedStyle));
+
+            const inlineSemanticTags = ['SPAN', 'B', 'STRONG', 'I', 'EM', 'U', 'A'];
+            const isInlineSemanticTag = inlineSemanticTags.includes(node.tagName);
+            const isBlockChild = !isInlineSemanticTag && (style.display === 'block' || style.display === 'list-item' || style.display === 'table');
+            const hasGeneratedText = runs.length > beforeRunCount;
+            const hasFollowingContent = Array.from(node.parentNode ? node.parentNode.childNodes : []).slice(
+              Array.from(node.parentNode ? node.parentNode.childNodes : []).indexOf(node) + 1
+            ).some(sibling => {
+              if (sibling.nodeType === 3) return sibling.textContent.trim().length > 0;
+              if (sibling.nodeType === 1) return (sibling.innerText || sibling.textContent || '').trim().length > 0 || sibling.tagName === 'BR';
+              return false;
+            });
+
+            if (isBlockChild && hasGeneratedText && hasFollowingContent) {
+              runs[runs.length - 1].breakLine = true;
+            }
           }
         }
 
