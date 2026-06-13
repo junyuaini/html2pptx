@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>2+3+5 行动法则</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { width: 1280px; height: 720px; font-family: "Microsoft YaHei", Arial, SimHei; overflow: hidden; }
+        .slide { width: 1280px; height: 720px; display: flex; flex-direction: column; }
+        .page-header { height: 80px; padding: 20px 60px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #A61B29; background: #FFFFFF; }
+        .page-title { font-size: 28px; color: #7A1E1E; font-weight: 700; }
+        .section-info { font-size: 16px; color: #8C7A66; white-space: nowrap; }
+        .page-body { flex: 1; height: 590px; padding: 30px 60px; background: linear-gradient(180deg, #F8F1E3 0%, #FFFFFF 100%); }
+        .formula { height: 105px; background: #FFFFFF; border: 1px solid #E8D8BF; border-radius: 18px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
+        .formula-text { font-size: 38px; color: #7A1E1E; font-weight: 700; white-space: nowrap; }
+        .n2 { color: #A61B29; font-size: 54px; }
+        .n3 { color: #C87941; font-size: 54px; }
+        .n5 { color: #D4AF37; font-size: 54px; }
+        .method-row { display: flex; gap: 24px; margin-bottom: 24px; }
+        .method-card { flex: 1; height: 205px; background: #FFFFFF; border: 1px solid #E8D8BF; border-radius: 16px; padding: 24px; }
+        .method-time { width: 112px; height: 44px; border-radius: 22px; display: flex; justify-content: center; align-items: center; color: #FFFFFF; font-size: 22px; font-weight: 700; margin-bottom: 18px; white-space: nowrap; }
+        .time-blue { background: #A61B29; }
+        .time-orange { background: #C87941; }
+        .time-green { background: #D4AF37; }
+        .method-title { font-size: 22px; color: #7A1E1E; font-weight: 700; margin-bottom: 12px; }
+        .method-desc { font-size: 16px; color: #6B4F3A; line-height: 1.7; }
+        .matrix-area { display: flex; gap: 24px; height: 170px; }
+        .matrix { width: 520px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; border: 1px solid #E8D8BF; border-radius: 16px; overflow: hidden; background: #FFFFFF; }
+        .cell { border-right: 1px solid #E8D8BF; border-bottom: 1px solid #E8D8BF; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: #7A1E1E; }
+        .cell:nth-child(2), .cell:nth-child(4) { border-right: 0; }
+        .cell:nth-child(3), .cell:nth-child(4) { border-bottom: 0; }
+        .cell-key { background: rgba(242,153,74,0.18); color: #9A3412; }
+        .priority-note { flex: 1; background: #FFFFFF; border: 1px solid #E8D8BF; border-radius: 16px; padding: 28px; display: flex; flex-direction: column; justify-content: center; }
+        .priority-title { font-size: 24px; font-weight: 700; color: #7A1E1E; margin-bottom: 14px; }
+        .priority-desc { font-size: 18px; color: #6B4F3A; line-height: 1.7; }
+        .page-footer { height: 50px; padding: 15px 60px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #E8D8BF; background: #FFFFFF; }
+        .footer-left, .footer-right { font-size: 14px; color: #8C7A66; }
+    </style>
+</head>
+<body>
+    <div class="slide">
+        <div class="page-header"><div class="page-title">2+3+5 行动法则</div><div class="section-info">06 / 时间与动机管理</div></div>
+        <div class="page-body">
+            <div class="formula"><div class="formula-text"><span class="n2">2分钟</span> + <span class="n3">3秒</span> + <span class="n5">5分钟</span> = 启动惯性</div></div>
+            <div class="method-row">
+                <div class="method-card"><div class="method-time time-blue">2分钟</div><div class="method-title">立即处理超短任务</div><div class="method-desc">例如回复邮件、整理桌面、打开资料，让任务从“想做”进入“正在做”。</div></div>
+                <div class="method-card"><div class="method-time time-orange">3秒</div><div class="method-title">倒计时强制启动</div><div class="method-desc">用 3、2、1 中断犹豫，避免陷入过度思考。</div></div>
+                <div class="method-card"><div class="method-time time-green">5分钟</div><div class="method-title">先承诺短时行动</div><div class="method-desc">只要求先做 5 分钟，行动后再自然延长时间。</div></div>
+            </div>
+            <div class="matrix-area">
+                <div class="matrix"><div class="cell cell-key">紧急且重要</div><div class="cell">重要不紧急</div><div class="cell">紧急不重要</div><div class="cell">不紧急不重要</div></div>
+                <div class="priority-note"><div class="priority-title">优先级提示</div><div class="priority-desc">按“紧急-重要”矩阵排序，优先处理既紧急又重要的事项。</div></div>
+            </div>
+        </div>
+        <div class="page-footer"><div class="footer-left">怎么解决拖延症 · 行动先于完美</div><div class="footer-right">08 / 10</div></div>
+    </div>
+</body>
+</html>

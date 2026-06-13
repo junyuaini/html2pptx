@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>行为启动：用最小动作破局</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { width: 1280px; height: 720px; font-family: "Microsoft YaHei", Arial, SimHei; overflow: hidden; }
+        .slide { width: 1280px; height: 720px; display: flex; flex-direction: column; }
+        .page-header { height: 80px; padding: 20px 60px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #A61B29; background: #FFFFFF; }
+        .page-title { font-size: 28px; color: #7A1E1E; font-weight: 700; }
+        .section-info { font-size: 16px; color: #8C7A66; white-space: nowrap; }
+        .page-body { flex: 1; height: 590px; padding: 36px 60px; background: linear-gradient(180deg, #F8F1E3 0%, #FFFFFF 100%); }
+        .main-area { display: flex; gap: 40px; height: 420px; }
+        .countdown-panel { width: 520px; background: #FFFFFF; border: 1px solid #E8D8BF; border-radius: 18px; padding: 34px; text-align: center; }
+        .numbers { display: flex; justify-content: center; gap: 32px; margin-top: 20px; margin-bottom: 30px; }
+        .num { font-size: 86px; font-weight: 700; line-height: 1; }
+        .num-3 { color: #2E5E4E; }
+        .num-2 { color: #A61B29; }
+        .num-1 { color: #D4AF37; }
+        .start-button { width: 320px; height: 62px; border-radius: 31px; background: linear-gradient(90deg, #A61B29, #D4AF37); color: #FFFFFF; font-size: 24px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin: 0 auto 28px auto; white-space: nowrap; }
+        .examples { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+        .example { padding: 8px 14px; background: #F7E8D0; color: #A61B29; border-radius: 18px; font-size: 15px; font-weight: 600; white-space: nowrap; }
+        .flow-panel { width: 600px; }
+        .step { height: 120px; background: #FFFFFF; border: 1px solid #E8D8BF; border-radius: 16px; padding: 22px; display: flex; align-items: center; margin-bottom: 20px; }
+        .step-badge { width: 46px; height: 46px; border-radius: 50%; background: linear-gradient(135deg, #A61B29, #D4AF37); color: #FFFFFF; display: flex; justify-content: center; align-items: center; font-size: 20px; font-weight: 700; margin-right: 18px; flex-shrink: 0; }
+        .step-content { flex: 1; }
+        .step-title { font-size: 22px; font-weight: 700; color: #7A1E1E; margin-bottom: 8px; white-space: nowrap; }
+        .step-desc { font-size: 16px; color: #6B4F3A; line-height: 1.5; }
+        .bottom-banner { height: 72px; margin-top: 24px; background: rgba(242,153,74,0.14); border: 1px solid rgba(242,153,74,0.5); border-radius: 16px; display: flex; align-items: center; justify-content: center; color: #7A1E1E; font-size: 24px; font-weight: 700; }
+        .page-footer { height: 50px; padding: 15px 60px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #E8D8BF; background: #FFFFFF; }
+        .footer-left, .footer-right { font-size: 14px; color: #8C7A66; }
+    </style>
+</head>
+<body>
+    <div class="slide">
+        <div class="page-header"><div class="page-title">行为启动：用最小动作破局</div><div class="section-info">04 / 优化执行策略</div></div>
+        <div class="page-body">
+            <div class="main-area">
+                <div class="countdown-panel">
+                    <div class="numbers"><span class="num num-3">3</span><span class="num num-2">2</span><span class="num num-1">1</span></div>
+                    <div class="start-button">立刻做最小行动</div>
+                    <div class="examples"><span class="example">坐起身</span><span class="example">打开文件</span><span class="example">写第一行</span><span class="example">读第一页</span></div>
+                </div>
+                <div class="flow-panel">
+                    <div class="step"><div class="step-badge">1</div><div class="step-content"><div class="step-title">停止争论</div><div class="step-desc">不要再和自己辩论做不做，先中断过度思考。</div></div></div>
+                    <div class="step"><div class="step-badge">2</div><div class="step-content"><div class="step-title">倒数启动</div><div class="step-desc">默念 3、2、1，让身体先于情绪进入行动。</div></div></div>
+                    <div class="step"><div class="step-badge">3</div><div class="step-content"><div class="step-title">完成最小动作</div><div class="step-desc">只做一个低门槛动作，让行动先发生。</div></div></div>
+                </div>
+            </div>
+            <div class="bottom-banner">关键不是马上完成全部，而是让行动先发生。</div>
+        </div>
+        <div class="page-footer"><div class="footer-left">怎么解决拖延症 · 行动先于完美</div><div class="footer-right">06 / 10</div></div>
+    </div>
+</body>
+</html>

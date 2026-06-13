@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>解决路径总览</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            width: 1280px;
+            height: 720px;
+            font-family: "Microsoft YaHei", Arial, SimHei;
+            overflow: hidden;
+        }
+        .slide {
+            width: 1280px;
+            height: 720px;
+            background: #F8F1E3;
+            position: relative;
+        }
+        .top-bar {
+            width: 1280px;
+            height: 4px;
+            background: linear-gradient(90deg, #A61B29 0%, #D4AF37 100%);
+        }
+        .title-area {
+            padding: 40px 60px 0 60px;
+        }
+        .page-title {
+            font-size: 42px;
+            font-weight: 700;
+            color: #7A1E1E;
+        }
+        .page-subtitle {
+            font-size: 18px;
+            color: #6B4F3A;
+            margin-top: 8px;
+        }
+        .cards-row {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            padding: 40px 60px 0 60px;
+        }
+        .path-card {
+            width: 210px;
+            height: 420px;
+            background: #FFFFFF;
+            border: 1px solid #E8D8BF;
+            border-radius: 18px;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .badge {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 20px;
+        }
+        .badge-01 { background: linear-gradient(135deg, #A61B29, #D4AF37); }
+        .badge-02 { background: linear-gradient(135deg, #2E5E4E, #C87941); }
+        .badge-03 { background: linear-gradient(135deg, #A61B29, #2E5E4E); }
+        .badge-04 { background: linear-gradient(135deg, #C87941, #D4AF37); }
+        .badge-05 { background: linear-gradient(135deg, #D4AF37, #A61B29); }
+        .card-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #7A1E1E;
+            margin-bottom: 20px;
+            text-align: center;
+            white-space: nowrap;
+        }
+        .card-line {
+            width: 40px;
+            height: 3px;
+            background: linear-gradient(90deg, #A61B29, #D4AF37);
+            border-radius: 2px;
+            margin-bottom: 20px;
+        }
+        .keyword {
+            font-size: 15px;
+            color: #6B4F3A;
+            margin-bottom: 10px;
+            text-align: center;
+            white-space: nowrap;
+        }
+        .path-line {
+            position: absolute;
+            bottom: 80px;
+            left: 60px;
+            right: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #A61B29 0%, #D4AF37 100%);
+            border-radius: 2px;
+        }
+        .bottom-hint {
+            position: absolute;
+            bottom: 30px;
+            left: 60px;
+            font-size: 14px;
+            color: #8C7A66;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide">
+        <div class="top-bar"></div>
+        <div class="title-area">
+            <div class="page-title">解决路径总览</div>
+            <div class="page-subtitle">从理解拖延到建立行动系统</div>
+        </div>
+        <div class="cards-row">
+            <div class="path-card">
+                <div class="badge badge-01">01</div>
+                <div class="card-title">认知重塑</div>
+                <div class="card-line"></div>
+                <div class="keyword">接纳</div>
+                <div class="keyword">拆解</div>
+                <div class="keyword">降低门槛</div>
+            </div>
+            <div class="path-card">
+                <div class="badge badge-02">02</div>
+                <div class="card-title">情绪管理</div>
+                <div class="card-line"></div>
+                <div class="keyword">识别恐惧</div>
+                <div class="keyword">缓解焦虑</div>
+                <div class="keyword">耐受训练</div>
+            </div>
+            <div class="path-card">
+                <div class="badge badge-03">03</div>
+                <div class="card-title">行为启动</div>
+                <div class="card-line"></div>
+                <div class="keyword">3秒启动</div>
+                <div class="keyword">最小动作</div>
+                <div class="keyword">破除惯性</div>
+            </div>
+            <div class="path-card">
+                <div class="badge badge-04">04</div>
+                <div class="card-title">时间动机</div>
+                <div class="card-line"></div>
+                <div class="keyword">2+3+5</div>
+                <div class="keyword">优先级</div>
+                <div class="keyword">行动节奏</div>
+            </div>
+            <div class="path-card">
+                <div class="badge badge-05">05</div>
+                <div class="card-title">长期调整</div>
+                <div class="card-line"></div>
+                <div class="keyword">成功记录</div>
+                <div class="keyword">自我效能</div>
+                <div class="keyword">专业帮助</div>
+            </div>
+        </div>
+        <div class="path-line"></div>
+        <div class="bottom-hint">解决拖延不是靠意志力硬扛，而是建立一套更容易开始、更容易坚持的行动系统。</div>
+    </div>
+</body>
+</html>

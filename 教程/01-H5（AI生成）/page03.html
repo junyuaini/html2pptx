@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>拖延不是懒惰</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            width: 1280px;
+            height: 720px;
+            font-family: "Microsoft YaHei", Arial, SimHei;
+            overflow: hidden;
+        }
+        .slide {
+            width: 1280px;
+            height: 720px;
+            display: flex;
+            flex-direction: column;
+        }
+        .page-header {
+            height: 80px;
+            padding: 20px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #A61B29;
+            background: #FFFFFF;
+        }
+        .page-title {
+            font-size: 28px;
+            color: #7A1E1E;
+            font-weight: 700;
+        }
+        .section-info {
+            font-size: 16px;
+            color: #8C7A66;
+            white-space: nowrap;
+        }
+        .page-body {
+            flex: 1;
+            height: 590px;
+            padding: 36px 60px;
+            background: linear-gradient(180deg, #F8F1E3 0%, #FFFFFF 100%);
+            display: flex;
+            gap: 40px;
+        }
+        .left-panel {
+            width: 520px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .big-point {
+            font-size: 38px;
+            font-weight: 700;
+            color: #7A1E1E;
+            line-height: 1.4;
+            margin-bottom: 28px;
+        }
+        .tags-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .tag {
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #FFFFFF;
+            white-space: nowrap;
+        }
+        .tag-purple { background: #2E5E4E; }
+        .tag-blue { background: #A61B29; }
+        .tag-orange { background: #C87941; }
+        .bottom-note {
+            font-size: 16px;
+            color: #6B4F3A;
+            line-height: 1.6;
+        }
+        .right-panel {
+            width: 580px;
+            position: relative;
+        }
+        .mech-card {
+            position: absolute;
+            width: 200px;
+            padding: 18px 16px;
+            background: #FFFFFF;
+            border: 1px solid #E8D8BF;
+            border-radius: 14px;
+            text-align: center;
+        }
+        .mech-card-top {
+            top: 20px;
+            left: 190px;
+            border-top: 4px solid #2E5E4E;
+        }
+        .mech-card-left {
+            top: 200px;
+            left: 20px;
+            border-top: 4px solid #A61B29;
+        }
+        .mech-card-right {
+            top: 200px;
+            right: 20px;
+            border-top: 4px solid #C87941;
+        }
+        .mech-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #7A1E1E;
+            margin-bottom: 6px;
+        }
+        .mech-desc {
+            font-size: 13px;
+            color: #6B4F3A;
+            line-height: 1.5;
+        }
+        .center-circle {
+            position: absolute;
+            top: 160px;
+            left: 210px;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            border: 3px solid #C02C38;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(232,93,117,0.06);
+        }
+        .center-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: #C02C38;
+            text-align: center;
+        }
+        .conn-line {
+            position: absolute;
+            background: #E8D8BF;
+        }
+        .line-v {
+            width: 2px;
+            height: 60px;
+            top: 110px;
+            left: 288px;
+        }
+        .line-h {
+            height: 2px;
+            width: 120px;
+            top: 260px;
+            left: 180px;
+        }
+        .line-h2 {
+            height: 2px;
+            width: 120px;
+            top: 260px;
+            left: 380px;
+        }
+        .page-footer {
+            height: 50px;
+            padding: 15px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #E8D8BF;
+            background: #FFFFFF;
+        }
+        .footer-left {
+            font-size: 14px;
+            color: #8C7A66;
+        }
+        .footer-right {
+            font-size: 14px;
+            color: #8C7A66;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide">
+        <div class="page-header">
+            <div class="page-title">拖延不是懒惰</div>
+            <div class="section-info">01 / 认知导入</div>
+        </div>
+        <div class="page-body">
+            <div class="left-panel">
+                <div class="big-point">拖延是自我调节的失败，<br>而非懒惰</div>
+                <div class="tags-row">
+                    <span class="tag tag-purple">情绪管理</span>
+                    <span class="tag tag-blue">认知偏差</span>
+                    <span class="tag tag-orange">环境干扰</span>
+                </div>
+                <div class="bottom-note">理解机制，是改变行为的第一步。<br>拖延后的自责会加剧焦虑，形成"焦虑—逃避—自责—更焦虑"的循环。</div>
+            </div>
+            <div class="right-panel">
+                <div class="conn-line line-v"></div>
+                <div class="conn-line line-h"></div>
+                <div class="conn-line line-h2"></div>
+                <div class="mech-card mech-card-top">
+                    <div class="mech-label">情绪压力</div>
+                    <div class="mech-desc">焦虑、恐惧、自责<br>驱动逃避行为</div>
+                </div>
+                <div class="mech-card mech-card-left">
+                    <div class="mech-label">认知负担</div>
+                    <div class="mech-desc">任务过大、完美主义<br>导致启动困难</div>
+                </div>
+                <div class="mech-card mech-card-right">
+                    <div class="mech-label">环境诱惑</div>
+                    <div class="mech-desc">手机、社交媒体<br>分散注意力</div>
+                </div>
+                <div class="center-circle">
+                    <span class="center-text">拖延<br>行为</span>
+                </div>
+            </div>
+        </div>
+        <div class="page-footer">
+            <div class="footer-left">怎么解决拖延症 · 行动先于完美</div>
+            <div class="footer-right">03 / 10</div>
+        </div>
+    </div>
+</body>
+</html>
