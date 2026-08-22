@@ -4,6 +4,8 @@
  */
 
 const PptxGenJS = require('pptxgenjs');
+const fs = require('fs');
+const path = require('path');
 const {
   colorToHex,
   extractTransparency,
@@ -113,6 +115,32 @@ function generateSlide(pptx, slideData, options = {}) {
           slide.background = { type: 'solid', color: gradientToColor(bodyBackgroundColor) };
         }
       }
+    } else if (/url\(["']?data:image\//.test(bodyBackgroundColor)) {
+      // 自定义修改：data: URL 背景图（如 .slide 的 base64 嵌入图），用 addImage 全幅平铺
+      // 抽取 url("...") 里的 data 部分
+      // 分组：m[1]=完整 dataURL; m[2]=mime(jpeg/png); m[3]=base64 内容
+      const m = bodyBackgroundColor.match(/url\(["']?(data:image\/([^;)"']+);base64,([^"')]+))["']?\)/);
+      const mime = m ? m[2] : null;  // 修：原用 m[1] 错（拿到完整 dataURL 当 mime）
+      const base64 = m ? m[3] : null;
+      if (base64) {
+        try {
+          // 落盘临时文件，用 path 方式 addImage（更稳）
+          const ext = (mime || 'png').replace('jpeg', 'jpg');
+          const tmpDir = path.join(require('os').tmpdir(), 'html2pptx-bg');
+          fs.mkdirSync(tmpDir, { recursive: true });
+          const tmpFile = path.join(tmpDir, `bg-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`);
+          fs.writeFileSync(tmpFile, Buffer.from(base64, 'base64'));
+          slide.addImage({
+            path: tmpFile,
+            x: 0,
+            y: 0,
+            w: PPT_WIDTH_INCH,
+            h: PPT_HEIGHT_INCH,
+          });
+        } catch (err) {
+          console.warn('[generate] body bg addImage failed:', err.message);
+        }
+      }
     } else {
       const bgColor = colorToHex(bodyBackgroundColor);
       if (bgColor) {
@@ -192,7 +220,16 @@ function generateSlide(pptx, slideData, options = {}) {
     const parentClassName = (pseudo.parentClassName || '').toString();
     const zIndex = parseInt(pseudo.zIndex, 10);
     const parentZIndex = parseInt(pseudo.parentZIndex, 10);
-    return parentClassName.split(/\s+/).includes('flow-line') || (Number.isFinite(zIndex) && Number.isFinite(parentZIndex) && zIndex < parentZIndex);
+    // === 方案B：扩大下层伪元素判定 ===
+    // 1) 父类为 flow-line（串联线）：明确下层
+    // 2) 伪元素显式 z-index <= 父元素 z-index：下层或同层（z-index:0 也算显式声明）
+    // 3) 伪元素 z-index < 0：负 z-index 一定在所有元素之下
+    const hasFlowLineClass = parentClassName.split(/\s+/).includes('flow-line');
+    const hasLowerZ = Number.isFinite(zIndex) && (
+      (Number.isFinite(parentZIndex) && zIndex <= parentZIndex) ||
+      (!Number.isFinite(parentZIndex) && zIndex <= 0)
+    );
+    return hasFlowLineClass || hasLowerZ;
   });
   const upperPseudoElements = pseudoElements.filter(pseudo => !lowerPseudoElements.includes(pseudo));
 
@@ -202,12 +239,37 @@ function generateSlide(pptx, slideData, options = {}) {
   // 2. 内容层：文本、图片等
   // 3. SVG 层
   // 4. 装饰层：需要置顶的伪元素
+  // BUG 修复：装饰元素（className 以 deco- 开头）排在页面背景之后、内容之前
+  // 避免装饰元素被 .slide 主背景覆盖（如 .deco-circle）
+  // === 方案B：在排序中引入 CSS z-index 作为权重 ===
+  // 优先级从低到高：
+  //   1) z-index 显式小于 0 的元素（最底层，负 z-index）
+  //   2) 装饰元素（className 以 deco- 开头）—— 排在页面背景之后
+  //   3) 背景容器（有背景色且无文字的容器）
+  //   4) 普通内容元素（默认层）
+  //   5) z-index 显式大于 0 的元素（最顶层，正 z-index）
+  // 同层按 y 坐标、再按 x 坐标排序
+  const isDecoElement = (el) => (el.className || '').toString().split(/\s+/).some(c => c.startsWith('deco-'));
+  const getEffectiveZIndex = (el) => (el && Number.isFinite(el.zIndex)) ? el.zIndex : 0;
   const sortedElements = [...elements].sort((a, b) => {
-    // 背景容器优先（有背景色且无文字的容器）
+    // 1) 负 z-index 排最前
+    const aZ = getEffectiveZIndex(a);
+    const bZ = getEffectiveZIndex(b);
+    if (aZ < 0 && bZ >= 0) return -1;
+    if (aZ >= 0 && bZ < 0) return 1;
+    // 2) 装饰元素优先级最低（页面背景之后，内容元素之后）
+    const aIsDeco = isDecoElement(a);
+    const bIsDeco = isDecoElement(b);
+    if (aIsDeco && !bIsDeco) return 1;
+    if (!aIsDeco && bIsDeco) return -1;
+    // 3) 背景容器优先（有背景色且无文字的容器）
     const aIsBg = isContainerElement(a.tag) && a.backgroundColor && (!a.text || a.text.length === 0);
     const bIsBg = isContainerElement(b.tag) && b.backgroundColor && (!b.text || b.text.length === 0);
     if (aIsBg && !bIsBg) return -1;
     if (!aIsBg && bIsBg) return 1;
+    // 4) 正 z-index 排最后（最上层）
+    if (aZ > 0 && bZ === 0) return 1;
+    if (aZ === 0 && bZ > 0) return -1;
     // 同层按 y 坐标排序
     return a.y - b.y || a.x - b.x;
   });
@@ -266,6 +328,14 @@ function generateSlide(pptx, slideData, options = {}) {
         const pseudo = slideData.pseudoElements ? slideData.pseudoElements.find(p =>
           p.isDecorLine && p.x >= el.x && p.x < el.x + 20 && p.y >= el.y && p.y < el.y + el.height
         ) : null;
+        // === BUG 修复：跳过已被父元素合并到 rich text runs 的子 SPAN 文本生成 ===
+        // 仅生成 SPAN 的 background 矩形（高亮底色），不生成独立文本框（避免重复）
+        if (el.tag === 'SPAN' && el._mergedIntoParentRuns && el.text) {
+          // 不调用 generateTextElement，跳过独立文本生成
+          processedAreas.push({ x: el.x, y: el.y, w: el.width, h: el.height });
+          return;
+        }
+
         if (pseudo) {
           // 文本向右偏移：伪元素宽度 + 伪元素margin-right（如果有）
           // ::before装饰条的offset = width + marginRight，确保装饰条和文本之间有正确的间距
@@ -534,12 +604,60 @@ function generateTextElement(slide, el, scale) {
 
 /**
  * 生成图片占位框
+ * 增强（自定义修改）：当 imgSrc 存在且能读到本地文件时，用 addImage 嵌入图片
+ * 否则回退到占位框
  */
 function generateImagePlaceholder(slide, el, scale) {
   const x = pxToInch(el.x, scale);
   const y = pxToInch(el.y, scale);
   const w = pxToInch(el.width, scale);
   const h = pxToInch(el.height, scale);
+
+  // 尝试读取图片二进制
+  let imageData = null;
+  if (el.imgSrc) {
+    try {
+      let src = el.imgSrc;
+      // puppeteer 在 file:// 下 el.src 通常已是 file:///... 绝对形式
+      if (src.startsWith('file:///')) {
+        // file:///C:/path/to/img.png  →  C:/path/to/img.png (Windows) 或 /path (Unix)
+        src = src.replace(/^file:\/\/\//, '');
+        // Windows: file:///C:/... 去掉 file:/// 后是 C:/...
+        if (process.platform === 'win32' && /^[A-Za-z]:/.test(src) === false) {
+          // Unix-like already
+        }
+        // URL decode（处理空格、中文）
+        src = decodeURIComponent(src);
+      } else if (/^https?:/.test(src)) {
+        // 远程图片暂不处理（保持占位框）
+        src = null;
+      }
+      if (src && fs.existsSync(src)) {
+        const buf = fs.readFileSync(src);
+        const ext = path.extname(src).slice(1).toLowerCase();
+        const mime = ext === 'jpg' ? 'jpeg' : ext;
+        imageData = `data:image/${mime};base64,${buf.toString('base64')}`;
+      }
+    } catch (err) {
+      // 读取失败，回退占位框
+      imageData = null;
+    }
+  }
+
+  if (imageData) {
+    try {
+      slide.addImage({
+        data: imageData,
+        x,
+        y,
+        w: Math.max(w, 0.1),
+        h: Math.max(h, 0.1),
+      });
+      return;
+    } catch (err) {
+      // addImage 失败（格式不支持等），回退占位框
+    }
+  }
 
   slide.addShape('rect', {
     x,
@@ -590,6 +708,16 @@ function generateContainer(slide, el, scale) {
   if (el.borderWidth > 0 || el.borderTopWidth > 0 || (el.width >= 17 && el.width <= 19 && el.height >= 17 && el.height <= 19)) {
     console.log(`[GENERATE-CONTAINER] tag=${el.tag}, text="${el.text}", borderWidth=${el.borderWidth}, borderColor=${el.borderColor}, borderTopWidth=${el.borderTopWidth}, borderRadius=${el.borderRadius}, x=${el.x}, y=${el.y}, w=${el.width}, h=${el.height}, className=${el.className}`);
   }
+
+  // 自定义修改：跳过"全画布背景形状"——这类形状是 .slide 容器的产物，
+  // 它的实际背景图已经通过 body url 分支 addImage 全幅铺了，再画矩形会盖住
+  const PPT_W = 13.333, PPT_H = 7.5;
+  const isFullSlideBg =
+    el.tag === 'DIV' &&
+    el.className === 'slide' &&
+    Math.abs(pxToInch(el.width, scale) - PPT_W) < 0.05 &&
+    Math.abs(pxToInch(el.height, scale) - PPT_H) < 0.05;
+  if (isFullSlideBg) return;
 
   let bgColor = el.backgroundColor;
   const hasBackground = bgColor && bgColor !== 'transparent' && bgColor !== 'rgba(0, 0, 0, 0)';

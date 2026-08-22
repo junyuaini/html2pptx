@@ -114,6 +114,22 @@ async function extractFromHtml(htmlPath, options = {}, verbose = false) {
           bodyBackgroundColor = null;
         }
       }
+      // 自定义修改：如果 body 背景是普通 rgb 纯色且没有 url，再读 .slide（首个子元素）的背景
+      // 因为很多 H5 把背景图放在 .slide 上
+      const hasImageBg = bodyBackgroundColor && bodyBackgroundColor.includes('url(');
+      if (!hasImageBg) {
+        const slideEl = document.querySelector('.slide') || firstChild;
+        if (slideEl) {
+          const slideStyle = window.getComputedStyle(slideEl);
+          const slideBg = slideStyle.backgroundImage;
+          const slideBgColor = slideStyle.backgroundColor;
+          if (slideBg && slideBg !== 'none' && slideBg.includes('url(')) {
+            bodyBackgroundColor = slideBg;
+          } else if (!bodyBackgroundColor && slideBgColor && slideBgColor !== 'rgba(0, 0, 0, 0)' && slideBgColor !== 'transparent') {
+            bodyBackgroundColor = slideBgColor;
+          }
+        }
+      }
       const results = [];
 
       function isDecorativeTextElement(el) {
@@ -146,6 +162,28 @@ async function extractFromHtml(htmlPath, options = {}, verbose = false) {
         // 跳过隐藏元素
         if (style.display === 'none' || style.visibility === 'hidden') return;
         if (rect.width < 1 && rect.height < 1) return;
+
+        // === BUG 修复：父元素已是 rich text 父元素时，子 SPAN 不再独立提取文本 ===
+        // 场景：<div>华彩生活APP<span class="accent">智能助手</span>升级方案</div>
+        // 父 div 会被 extractRuns 合并为完整富文本（含 SPAN 文字），
+        // 此处标记 SPAN 由 generate.js 阶段跳过独立文本生成，避免 PPT 中出现重复文本框。
+        // SPAN 的 background 矩形仍会被后续逻辑保留为高亮底色。
+        if (tag === 'SPAN' && el.parentElement) {
+          const parent = el.parentElement;
+          const parentTag = parent.tagName;
+          const richTextParentTags = ['DIV', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'P', 'LI'];
+          if (richTextParentTags.includes(parentTag)) {
+            let parentDirectText = '';
+            el.parentNode.childNodes.forEach(node => {
+              if (node.nodeType === 3) parentDirectText += node.textContent;
+            });
+            if (parentDirectText.trim().length > 0) {
+              // 标记：父元素会作为 rich text 父元素处理该 SPAN
+              // 标记会随 el 对象传递到 generate.js
+              el._mergedIntoParentRuns = true;
+            }
+          }
+        }
 
         // 提取文本内容（所有元素都尝试提取）
         let text = '';
@@ -253,6 +291,8 @@ async function extractFromHtml(htmlPath, options = {}, verbose = false) {
           textAlign: style.textAlign,
           lineHeight: style.lineHeight,
           backgroundColor: bgColor,
+          // BUG 修复：传递"已被父元素合并到 rich text runs"标记
+          _mergedIntoParentRuns: el._mergedIntoParentRuns === true,
           borderColor: style.borderColor,
           borderWidth: parseFloat(style.borderWidth) || 0,
           borderStyle: style.borderStyle,
@@ -281,6 +321,17 @@ async function extractFromHtml(htmlPath, options = {}, verbose = false) {
           verticalAlign: style.verticalAlign,
           flexDirection: style.flexDirection,
           whiteSpace: style.whiteSpace,
+          // === 方案B：收集 CSS z-index 供 generate.js 排序使用 ===
+          // computed style 的 zIndex 可能是 'auto' / '0' / '10' 等字符串，
+          // 这里统一转成数字：auto/非数字 → null，数字字符串 → 整数。
+          // 元素 position 为 static 时 z-index 不生效，视为 null，避免误判层级。
+          zIndex: (() => {
+            if (style.position === 'static') return null;
+            if (!style.zIndex || style.zIndex === 'auto') return null;
+            const parsed = parseInt(style.zIndex, 10);
+            return Number.isFinite(parsed) ? parsed : null;
+          })(),
+          position: style.position,
           padding: {
             top: parseFloat(style.paddingTop) || 0,
             right: parseFloat(style.paddingRight) || 0,
@@ -293,7 +344,8 @@ async function extractFromHtml(htmlPath, options = {}, verbose = false) {
       // 调试：打印所有找到的元素
       console.log('--- ALL ELEMENTS ---');
       results.forEach(el => {
-        if (el.className && el.className.includes('check')) {
+        const _cn = (el.className || '').toString();
+        if (_cn && _cn.includes('check')) {
           console.log(`[ELEMENT] ${el.className} at x=${el.x}, y=${el.y}, w=${el.width}, h=${el.height}, bg=${el.backgroundColor}, bw=${el.borderWidth}`);
         }
       });
