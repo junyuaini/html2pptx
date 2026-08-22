@@ -10,3 +10,10 @@ debug_*.json
 *.log
 .DS_Store
 Thumbs.db
+
+# 临时调试脚本 / 备份文件
+_convert.js
+snap_mockups.js
+src/*.bak1
+src/*.bak_classname
+src/*.bak*
